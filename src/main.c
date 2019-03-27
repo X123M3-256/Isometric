@@ -1,16 +1,18 @@
 #include<stdio.h>
 #include<stdbool.h>
+#include<stdint.h>
 #include<SDL.h>
 
 //Screen dimension constants
 const int SCREEN_WIDTH=640;
 const int SCREEN_HEIGHT=480;
 
-
-
-
-
-
+void render_sprite(SDL_Surface* src,SDL_Surface* dst,uint32_t x,uint32_t y,uint32_t z)
+{
+SDL_Rect src_rect={0,0,src->w,src->h};
+SDL_Rect dst_rect={(y-x)*16,-(x+y+z)*8,src->w,src->h};
+SDL_BlitSurface(src,&src_rect,dst,&dst_rect);
+}
 
 
 
@@ -28,8 +30,9 @@ int main(int argc,char* args[])
 		printf("Window could not be created! SDL_Error: %s\n",SDL_GetError());
 		exit(1);	
 		}
-	SDL_Surface* screenSurface=SDL_GetWindowSurface(window);
-	
+	SDL_Surface* display=SDL_GetWindowSurface(window);
+	SDL_Surface* test=SDL_LoadBMP("test.bmp");
+
 	int running=true;
 		while(running)
 		{
@@ -38,7 +41,12 @@ int main(int argc,char* args[])
 			{
 				if(event.type==SDL_QUIT)running=false;
 			}
-		SDL_Surface* sdl_surf=SDL_GetWindowSurface(window);
+		
+		render_sprite(test,display,-10,1,0);	
+		render_sprite(test,display,-10,1,1);	
+		render_sprite(test,display,-11,1,0);	
+		render_sprite(test,display,-10,0,0);	
+		render_sprite(test,display,-11,0,0);	
 		SDL_UpdateWindowSurface(window);
 		}
 	SDL_DestroyWindow(window);
