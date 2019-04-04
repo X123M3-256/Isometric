@@ -4,7 +4,7 @@
 #include<SDL.h>
 
 #include "render.h"
-#include "map.h"
+#include "dynamic.h"
 
 //Screen dimension constants
 const int SCREEN_WIDTH=640;
@@ -41,17 +41,6 @@ int main(int argc,char* args[])
 	ctx.y_offset[1]=-23;
 	int running=true;
 
-	dynamic_sprite_t box;
-	box.x_min=-(1<<14);
-	box.x_max=1<<14;
-	box.y_min=-(1<<14);
-	box.y_max=1<<14;
-	box.z_min=0;
-	box.z_max=1<<15;
-	box.x=(4<<16)+(1<<15);
-	box.y=(4<<16)+(1<<15);
-	box.z=2<<16;
-	box.sprite=1;
 
 		while(running)
 		{
@@ -66,13 +55,15 @@ int main(int argc,char* args[])
 				}
 			}
 		const Uint8* keys=SDL_GetKeyboardState(NULL);
-			if(keys[SDL_SCANCODE_LEFT])box.x+=128;
-			if(keys[SDL_SCANCODE_RIGHT])box.x-=128;
-			if(keys[SDL_SCANCODE_UP])box.y-=128;
-			if(keys[SDL_SCANCODE_DOWN])box.y+=128;
-			if(keys[SDL_SCANCODE_W])box.z+=128;
-			if(keys[SDL_SCANCODE_S])box.z-=128;
-		map_render(&test_map,&ctx,&box);
+			if(keys[SDL_SCANCODE_LEFT])test_sprites.sprites[0].x+=128;
+			if(keys[SDL_SCANCODE_RIGHT])test_sprites.sprites[0].x-=128;
+			if(keys[SDL_SCANCODE_UP])test_sprites.sprites[0].y-=128;
+			if(keys[SDL_SCANCODE_DOWN])test_sprites.sprites[0].y+=128;
+			if(keys[SDL_SCANCODE_W])test_sprites.sprites[0].z+=128;
+			if(keys[SDL_SCANCODE_S])test_sprites.sprites[0].z-=128;
+		SDL_Rect screen={0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
+		SDL_FillRect(ctx.display,&screen,0);
+		dynamic_render(&test_sprites,&ctx);
 		SDL_UpdateWindowSurface(window);
 		}
 	SDL_DestroyWindow(window);
