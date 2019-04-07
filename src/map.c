@@ -35,68 +35,77 @@ map_tile_t map_get_tile(map_t* map,uint32_t x,uint32_t y)
 	}
 
 
-
-uint32_t tile_render(map_t* map,render_context_t* ctx,uint32_t x,uint32_t y,uint32_t start,int32_t z_max)
-{
-map_tile_t tile=map_get_tile(map,x,y);
-	for(uint32_t i=start;i<tile.num_sprites;i++)
-	{
-	map_sprite_t sprite=map->sprites[tile.sprite_index+i];
-		if((sprite.z_max<<16)>z_max)return i;
-	render_sprite(ctx,sprite.sprite,(1<<15)+((int32_t)x<<16),(1<<15)+((int32_t)y<<16),(int32_t)sprite.z_min<<16);
-	}
-return tile.num_sprites;
-}
-
-
 //void map_is_intersecting(map_t* map,)
 
-void map_render(map_t* map,render_context_t* ctx,dynamic_sprite_t* dynamic)
-{
-//Find tile on which dynamic belongs
-int32_t x_min=(dynamic->x+dynamic->x_min)>>16;
-int32_t y_min=(dynamic->y+dynamic->y_min)>>16;
-//
-uint32_t* tile_sprites_rendered=calloc(map->width*map->height,sizeof(uint32_t));
 
-	for(uint32_t xy_sum=0;xy_sum<map->width+map->height;xy_sum++)
+uint32_t min(uint32_t a,uint32_t b)
 	{
-	uint32_t start_x,iterations;
-		if(xy_sum<map->width)
-		{
-		iterations=xy_sum+1;
-		start_x=0;
-		}
-		else
-		{
-		iterations=2*map->width-xy_sum-1;
-		start_x=1+xy_sum-map->width;
-		}
+	return a<b?a:b;
+	}
 
-		bool dynamic_object_found=false;
-	
-		for(uint32_t i=0;i<iterations;i++)
+int32_t floor_fix(int32_t x)
+	{
+	return x>>16;
+	} 
+
+int32_t ceil_fix(int32_t x)
+	{
+	return (x>>16)+((x&0xFFFF)?1:0);
+	}
+
+//         x
+//       x   x
+//     x   x   x
+//   x   x   x   x
+// x   x   x   x   x
+//   x   x   x   x
+//     x   x   x
+//       x   x
+//         x
+
+void map_render_tile(map_t* map, render_context_t* ctx,uint32_t x,uint32_t y,uint32_t col)
+{
+map_tile_t tile=map_get_tile(map,x,y);
+	for(uint32_t i=0;i<tile.num_sprites;i++)
+	{
+	map_sprite_t sprite=map->sprites[tile.sprite_index+i];
+	render_sprite(ctx,sprite.sprite,(1<<15)+((int32_t)x<<16),(1<<15)+((int32_t)y<<16),(int32_t)sprite.z_min<<16,col*32,(col+1)*32);
+	}
+}
+
+void map_render_column(map_t* map,render_context_t* ctx,int32_t col)
+{
+uint32_t x,y;
+	if(col-8>=0)
+	{
+	x=0;
+	y=col-8;
+		while(x<map->width&&y<map->height)
 		{
-		uint32_t x=start_x+i;
-		uint32_t y=xy_sum-x;
-			if(x==x_min&&y==y_min)
-			{
-			dynamic_object_found=true;	
-			tile_sprites_rendered[x+y*map->width]=tile_render(map,ctx,x,y,tile_sprites_rendered[x+y*map->width],dynamic->z+dynamic->z_min);
-			}
-			else
-			{
-			tile_sprites_rendered[x+y*map->width]=tile_render(map,ctx,x,y,tile_sprites_rendered[x+y*map->width],INT32_MAX);
-			}
-		}
-		if(dynamic_object_found)
-		{
-			if(x_min+1<map->width)tile_sprites_rendered[(x_min+1)+y_min*map->width]=tile_render(map,ctx,x_min+1,y_min,tile_sprites_rendered[(x_min+1)+y_min*map->width],dynamic->z+dynamic->z_min);
-			if(y_min+1<map->height)tile_sprites_rendered[x_min+(y_min+1)*map->width]=tile_render(map,ctx,x_min,y_min+1,tile_sprites_rendered[x_min+(y_min+1)*map->width],dynamic->z+dynamic->z_min);
-			if(x_min+1<map->width&&y_min+1<map->height)tile_sprites_rendered[(x_min+1)+(y_min+1)*map->width]=tile_render(map,ctx,x_min+1,y_min+1,tile_sprites_rendered[(x_min+1)+(y_min+1)*map->width],dynamic->z+dynamic->z_min);
-			render_sprite(ctx,dynamic->sprite,dynamic->x,dynamic->y,dynamic->z);
-			tile_sprites_rendered[x_min+y_min*map->width]=tile_render(map,ctx,x_min,y_min,tile_sprites_rendered[x_min+y_min*map->width],INT32_MAX);
+		map_render_tile(map,ctx,x,y,col);
+			if(y+1<map->height)map_render_tile(map,ctx,x,y+1,col);
+		x++;
+		y++;
 		}
 	}
-free(tile_sprites_rendered);
+	else
+	{
+	x=-(col-8)-1;
+	y=0;
+		while(x<map->width&&y<map->height)
+		{
+		map_render_tile(map,ctx,x,y,col);
+			if(x+1<map->width)map_render_tile(map,ctx,x+1,y,col);
+		x++;
+		y++;
+		}
+	}
+}
+
+void map_render(map_t* map,render_context_t* ctx,dynamic_sprite_collection_t* dynamic)
+{
+	for(uint32_t col=0;col<20;col++)
+	{
+	map_render_column(map,ctx,col);
+	}
 }

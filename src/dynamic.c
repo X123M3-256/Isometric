@@ -54,7 +54,7 @@ sprites->sprites[i].invalid=0;
 		}
 	}
 //Render the sprite
-render_sprite(ctx,sprites->sprites[i].sprite,sprites->sprites[i].x,sprites->sprites[i].y,sprites->sprites[i].z);
+render_sprite(ctx,sprites->sprites[i].sprite,sprites->sprites[i].x,sprites->sprites[i].y,sprites->sprites[i].z,INT32_MIN,INT32_MAX);
 }
 
 void dynamic_render(dynamic_sprite_collection_t* sprites,render_context_t* ctx)

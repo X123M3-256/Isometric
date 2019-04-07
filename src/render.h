@@ -11,6 +11,6 @@ typedef struct
 	}render_context_t;
 
 
-void render_sprite(render_context_t* ctx,uint16_t sprite,int32_t x,int32_t y,int32_t z);
+void render_sprite(render_context_t* ctx,uint16_t sprite,int32_t x,int32_t y,int32_t z,int32_t x_clip_min,int32_t x_clip_max);
 
 #endif

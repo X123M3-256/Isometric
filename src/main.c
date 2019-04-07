@@ -4,6 +4,7 @@
 #include<SDL.h>
 
 #include "render.h"
+#include "map.h"
 #include "dynamic.h"
 
 //Screen dimension constants
@@ -63,7 +64,8 @@ int main(int argc,char* args[])
 			if(keys[SDL_SCANCODE_S])test_sprites.sprites[0].z-=128;
 		SDL_Rect screen={0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 		SDL_FillRect(ctx.display,&screen,0);
-		dynamic_render(&test_sprites,&ctx);
+		map_render(&test_map,&ctx,&test_sprites);
+//		dynamic_render(&test_sprites,&ctx);
 		SDL_UpdateWindowSurface(window);
 		}
 	SDL_DestroyWindow(window);
