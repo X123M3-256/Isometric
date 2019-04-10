@@ -5,7 +5,7 @@
 
 #include "render.h"
 #include "map.h"
-#include "dynamic.h"
+#include "sprite.h"
 
 //Screen dimension constants
 const int SCREEN_WIDTH=640;
@@ -65,7 +65,7 @@ int main(int argc,char* args[])
 		SDL_Rect screen={0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 		SDL_FillRect(ctx.display,&screen,0);
 		map_render(&test_map,&ctx,&test_sprites);
-//		dynamic_render(&test_sprites,&ctx);
+//		render(&test_sprites,&ctx);
 		SDL_UpdateWindowSurface(window);
 		}
 	SDL_DestroyWindow(window);

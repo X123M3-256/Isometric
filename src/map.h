@@ -3,7 +3,7 @@
 
 #include<stdint.h>
 #include "render.h"
-#include "dynamic.h"
+#include "sprite.h"
 
 typedef struct
 {
@@ -28,5 +28,5 @@ map_sprite_t* sprites;
 
 extern map_t test_map;
 
-void map_render(map_t* map,render_context_t* ctx,dynamic_sprite_collection_t* dynamic);
+void map_render(map_t* map,render_context_t* ctx,sprite_collection_t* dynamic);
 #endif

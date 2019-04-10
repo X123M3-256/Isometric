@@ -13,20 +13,20 @@ bounding_box_t bounds;
 int32_t x,y,z;
 uint16_t sprite;
 uint16_t invalid;
-}dynamic_sprite_t;
+}sprite_t;
 
 
 
 typedef struct
 {
 uint32_t num_sprites;
-dynamic_sprite_t* sprites;
-}dynamic_sprite_collection_t;
+sprite_t* sprites;
+}sprite_collection_t;
 
 
-extern dynamic_sprite_collection_t test_sprites;
+extern sprite_collection_t test_sprites;
 
-void dynamic_render(dynamic_sprite_collection_t* sprites,render_context_t* ctx);
+void render_sprites(sprite_collection_t* sprites,render_context_t* ctx,uint32_t x_clip_min,uint32_t x_clip_max);
 
 
 
