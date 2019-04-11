@@ -32,41 +32,34 @@ bounding_box_t B=sprite_get_bounding_box(sprite2);
 return false;
 }
 
-sprite_t sprites[5]=
-	{
-	{{-(1<<14),1<<14,-(1<<14),1<<14,0,1<<15},(3<<16)+(1<<15),(2<<16)+(1<<15),1<<16,1},
-	{-(1<<14),1<<14,-(1<<14),1<<14,0,1<<15,(3<<16)+(1<<15),(4<<16)+(1<<15),1<<16,1},
-	{-(1<<14),1<<14,-(1<<14),1<<14,0,1<<15,(4<<16)+(1<<15),(3<<16)+(1<<15),1<<16,1},
-	{-(1<<14),1<<14,-(1<<14),1<<14,0,1<<15,(4<<16)+(1<<14),(3<<16)+(1<<14),(3<<15),1},
-	{-(1<<14),1<<14,-(1<<14),1<<14,0,1<<15,(4<<16)+(3<<14),(3<<16),(2<<15),1}
-	};
-sprite_collection_t test_sprites={5,sprites};
 
-void render_sprite_with_dependencies(sprite_collection_t* sprites,render_context_t* ctx,uint32_t i,uint32_t x_clip_min,uint32_t x_clip_max)
+uint32_t add_sprite_with_dependencies(sprite_t* src,sprite_t* dst,uint32_t num_sprites,uint32_t sprites_added,uint32_t i)
 {
-sprites->sprites[i].invalid=0;
-//Render all sprites that are behind this one and have not been rendered
-	for(uint32_t j=0;j<sprites->num_sprites;j++)
+src[i].visited=1;
+//Add all sprites that should be drawn before this one
+	for(uint32_t j=0;j<num_sprites;j++)
 	{
-		if(is_behind(sprites->sprites+j,sprites->sprites+i)&&sprites->sprites[j].invalid==1)
+		if(is_behind(src+j,src+i)&&src[j].visited==0)
 		{
-		render_sprite_with_dependencies(sprites,ctx,j,x_clip_min,x_clip_max);
+		sprites_added=add_sprite_with_dependencies(src,dst,num_sprites,sprites_added,j);
 		}
 	}
-//Render the sprite
-render_sprite(ctx,sprites->sprites[i].sprite,sprites->sprites[i].x,sprites->sprites[i].y,sprites->sprites[i].z,x_clip_min,x_clip_max);
+//Add sprite to output
+dst[sprites_added]=src[i];
+return sprites_added+1;
 }
 
-void render_sprites(sprite_collection_t* sprites,render_context_t* ctx,uint32_t x_clip_min,uint32_t x_clip_max)
+void sort_sprites(sprite_t* src,sprite_t* dst,uint32_t num_sprites)
 {
-//Invalidate all sprites
-	for(uint32_t i=0;i<sprites->num_sprites;i++)sprites->sprites[i].invalid=1;
-//Render all sprites
-	for(uint32_t i=0;i<sprites->num_sprites;i++)
+//Mark all sprites unvisited
+	for(uint32_t i=0;i<num_sprites;i++)src[i].visited=0;
+//Sort sprites
+uint32_t sprites_added=0;
+	for(uint32_t i=0;i<num_sprites;i++)
 	{
-		if(sprites->sprites[i].invalid==1)
+		if(src[i].visited==0)
 		{
-		render_sprite_with_dependencies(sprites,ctx,i,x_clip_min,x_clip_max);
+		sprites_added=add_sprite_with_dependencies(src,dst,num_sprites,sprites_added,i);
 		}
 	}
 }

@@ -7,11 +7,11 @@
 #include "map.h"
 #include "sprite.h"
 
+#include "viewport.h"
+
 //Screen dimension constants
 const int SCREEN_WIDTH=640;
 const int SCREEN_HEIGHT=480;
-
-
 
 
 int main(int argc,char* args[])
@@ -42,7 +42,8 @@ int main(int argc,char* args[])
 	ctx.y_offset[1]=-23;
 	int running=true;
 
-
+	viewport_t viewport={0,SCREEN_WIDTH,0,SCREEN_HEIGHT,0,0,0,2,&test_map};
+	
 		while(running)
 		{
 		SDL_Event event;
@@ -56,16 +57,29 @@ int main(int argc,char* args[])
 				}
 			}
 		const Uint8* keys=SDL_GetKeyboardState(NULL);
-			if(keys[SDL_SCANCODE_LEFT])test_sprites.sprites[0].x+=128;
-			if(keys[SDL_SCANCODE_RIGHT])test_sprites.sprites[0].x-=128;
-			if(keys[SDL_SCANCODE_UP])test_sprites.sprites[0].y-=128;
-			if(keys[SDL_SCANCODE_DOWN])test_sprites.sprites[0].y+=128;
-			if(keys[SDL_SCANCODE_W])test_sprites.sprites[0].z+=128;
-			if(keys[SDL_SCANCODE_S])test_sprites.sprites[0].z-=128;
+			if(keys[SDL_SCANCODE_LEFT])
+			{
+			viewport.x+=128;
+			viewport.y-=128;
+			}
+			if(keys[SDL_SCANCODE_RIGHT])
+			{
+			viewport.x-=128;
+			viewport.y+=128;
+			}
+			if(keys[SDL_SCANCODE_UP])
+			{
+			viewport.x-=256;
+			viewport.y-=256;
+			}
+			if(keys[SDL_SCANCODE_DOWN])
+			{
+			viewport.x+=256;
+			viewport.y+=256;
+			}
 		SDL_Rect screen={0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
 		SDL_FillRect(ctx.display,&screen,0);
-		map_render(&test_map,&ctx,&test_sprites);
-//		render(&test_sprites,&ctx);
+		viewport_render(&viewport,&ctx);
 		SDL_UpdateWindowSurface(window);
 		}
 	SDL_DestroyWindow(window);
